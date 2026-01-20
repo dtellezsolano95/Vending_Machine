@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/product', name: 'api_product_')]
+#[Route('/api/product')]
 class PurchaseProductController extends AbstractController
 {
     private GetProductUseCase $getProductUseCase;

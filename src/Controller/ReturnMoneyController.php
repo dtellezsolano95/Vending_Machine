@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/money', name: 'api_money_')]
+#[Route('/api/money')]
 class ReturnMoneyController extends AbstractController
 {
     private ReturnMoneyUseCase $returnMoneyUseCase;
