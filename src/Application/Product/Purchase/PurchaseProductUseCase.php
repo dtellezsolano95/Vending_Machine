@@ -19,9 +19,9 @@ class PurchaseProductUseCase
         $this->moneyRepository = $moneyRepository;
     }
 
-    public function execute(string $product): PurchaseProductResponse
+    public function execute(PurchaseProductRequest $request): PurchaseProductResponse
     {
-        $productName = new ProductName($product);
+        $productName = new ProductName($request->product());
         $product = Product::create($productName);
 
         $moneyInserted = $this->moneyRepository->getCurrentBalance();

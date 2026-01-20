@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Application\Product\Purchase\PurchaseProductRequest;
 use App\Application\Product\Purchase\PurchaseProductUseCase;
 use App\Domain\Money\Exception\InvalidCoinValueException;
 use InvalidArgumentException;
@@ -29,14 +30,8 @@ class PurchaseProductController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
-            if (!isset($data['product'])) {
-                return $this->json([
-                    'message' => 'Product field is required'
-                ], 400);
-            }
-            
-            $product = $data['product'];
-            $response = $this->purchaseProductUseCase->execute($product);
+            $purchaseRequest = new PurchaseProductRequest($data['product'] ?? null);
+            $response = $this->purchaseProductUseCase->execute($purchaseRequest);
 
             return $this->json([
                 'product_name' => $response->productName(),
