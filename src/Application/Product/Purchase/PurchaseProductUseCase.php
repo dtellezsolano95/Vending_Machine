@@ -3,7 +3,7 @@
 namespace App\Application\Product\Purchase;
 
 use App\Domain\Money\MoneyRepositoryInterface;
-use App\Domain\Product\Product;
+use App\Domain\Product\ProductFactory;
 use App\Domain\Product\ProductName;
 use App\Domain\Product\ProductRepositoryInterface;
 
@@ -21,8 +21,7 @@ class PurchaseProductUseCase
 
     public function execute(PurchaseProductRequest $request): PurchaseProductResponse
     {
-        $productName = new ProductName($request->product());
-        $product = Product::create($productName);
+        $product = ProductFactory::create($request->product());
 
         $moneyInserted = $this->moneyRepository->getCurrentBalance();
 
@@ -33,7 +32,7 @@ class PurchaseProductUseCase
         $this->moneyRepository->clearCoins();
 
         return new PurchaseProductResponse(
-            $product->name()->value(),
+            $product->name(),
             $change
         );
     }
