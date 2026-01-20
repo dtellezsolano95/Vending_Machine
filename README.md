@@ -68,6 +68,39 @@ Response example:
 }
 ```
 
+### Return money
+
+**POST** `/api/money/return`
+
+Response example:
+```json
+{
+    "coins_returned": []
+}
+```
+
+### Purchase product
+
+**POST** `/api/product/purchase`
+
+Request example:
+```json
+{
+    "product": "WATER"
+}
+```
+
+Response example:
+```json
+{
+    "product_name": "WATER",
+    "change_returned": [
+        0.25,
+        0.1
+    ]
+}
+```
+
 
 ## Stop containers
 
