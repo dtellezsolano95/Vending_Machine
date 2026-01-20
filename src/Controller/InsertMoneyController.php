@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Application\Money\Insert\InsertMoneyRequest;
 use App\Application\Money\Insert\InsertMoneyUseCase;
-use App\Application\Money\Return\ReturnMoneyUseCase;
 use App\Domain\Money\Exception\InvalidCoinValueException;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,15 +12,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/money', name: 'api_money_')]
-class MoneyController extends AbstractController
+class InsertMoneyController extends AbstractController
 {
     private InsertMoneyUseCase $insertMoneyUseCase;
-    private ReturnMoneyUseCase $returnMoneyUseCase;
 
-    public function __construct(InsertMoneyUseCase $insertMoneyUseCase, ReturnMoneyUseCase $returnMoneyUseCase)
+    public function __construct(InsertMoneyUseCase $insertMoneyUseCase)
     {
         $this->insertMoneyUseCase = $insertMoneyUseCase;
-        $this->returnMoneyUseCase = $returnMoneyUseCase;
     }
 
     /**
@@ -52,33 +49,6 @@ class MoneyController extends AbstractController
         } catch (\Exception $e) {
             return $this->json([
                 'message' => 'Failed to insert coin'
-            ], 500);
-        }
-    }
-
-    /**
-    * Return all inserted money from the vending machine
-    */
-    #[Route('/return', name: 'return', methods: ['POST'])]
-    public function return(Request $request): JsonResponse
-    {
-        try {
-            $response = $this->returnMoneyUseCase->execute();
-
-            return $this->json([
-                'coins_returned' => $response->coinsReturned()
-            ]);
-        } catch (InvalidArgumentException $e) {
-            return $this->json([
-                'message' => $e->getMessage()
-            ], 400);
-        } catch (InvalidCoinValueException $e) {
-            return $this->json([
-                'message' => $e->getMessage()
-            ], 400);
-        } catch (\Exception $e) {
-            return $this->json([
-                'message' => 'Failed to return coins'
             ], 500);
         }
     }
