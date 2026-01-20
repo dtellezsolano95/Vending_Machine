@@ -9,6 +9,8 @@ use App\Domain\Product\ProductRepositoryInterface;
 
 class GetProductUseCase
 {
+    private const AVAILABLE_RETURN_COINS = [0.25, 0.10, 0.05];
+
     private ProductRepositoryInterface $productRepository;
     private MoneyRepositoryInterface $moneyRepository;
     public function __construct(ProductRepositoryInterface $productRepository, MoneyRepositoryInterface $moneyRepository)
@@ -26,7 +28,7 @@ class GetProductUseCase
 
         $product->checkPrice($moneyInserted);
 
-        $change = $product->calculateChange($moneyInserted);
+        $change = $this->calculateChange($moneyInserted, $product->price());
 
         $this->moneyRepository->clearCoins();
 
@@ -34,5 +36,23 @@ class GetProductUseCase
             $product->name()->value(),
             $change
         );
+    }
+
+    private function calculateChange(float $moneyInserted, float $productPrice): array
+    {
+        $change = [];
+
+        $difference = $moneyInserted - $productPrice;
+        
+        $remaining = round($difference, 2);
+        
+        foreach (self::AVAILABLE_RETURN_COINS as $coin) {
+            while ($remaining >= $coin - 0.001) {
+                $change[] = $coin;
+                $remaining = round($remaining - $coin, 2);
+            }
+        }
+        
+        return $change;
     }
 }
