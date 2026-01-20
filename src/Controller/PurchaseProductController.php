@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Application\Product\Get\GetProductUseCase;
+use App\Application\Product\Purchase\PurchaseProductUseCase;
 use App\Domain\Money\Exception\InvalidCoinValueException;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,11 +13,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/product')]
 class PurchaseProductController extends AbstractController
 {
-    private GetProductUseCase $getProductUseCase;
+    private PurchaseProductUseCase $purchaseProductUseCase;
 
-    public function __construct(GetProductUseCase $getProductUseCase)
+    public function __construct(PurchaseProductUseCase $purchaseProductUseCase)
     {
-        $this->getProductUseCase = $getProductUseCase;
+        $this->purchaseProductUseCase = $purchaseProductUseCase;
     }
 
     /**
@@ -36,7 +36,7 @@ class PurchaseProductController extends AbstractController
             }
             
             $product = $data['product'];
-            $response = $this->getProductUseCase->execute($product);
+            $response = $this->purchaseProductUseCase->execute($product);
 
             return $this->json([
                 'product_name' => $response->productName(),
