@@ -23,6 +23,8 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    # Money Repository - Bind interface to concrete implementation
     App\Domain\Money\MoneyRepositoryInterface:
-        class: App\Infrastructure\Persistence\FileMoneyRepository
+        class: App\Infrastructure\Persistence\Money\FileMoneyRepository
+
+    App\Domain\Product\ProductRepositoryInterface:
+        class: App\Infrastructure\Persistence\Product\FileProductRepository

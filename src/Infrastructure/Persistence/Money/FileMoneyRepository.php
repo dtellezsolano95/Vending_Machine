@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Persistence;
+namespace App\Infrastructure\Persistence\Money;
 
 use App\Domain\Money\Coin;
 use App\Domain\Money\MoneyRepositoryInterface;
