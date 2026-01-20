@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/product', name: 'api_product_')]
-class GetProductController extends AbstractController
+class PurchaseProductController extends AbstractController
 {
     private GetProductUseCase $getProductUseCase;
 
@@ -21,12 +21,21 @@ class GetProductController extends AbstractController
     }
 
     /**
-    * Get specific product from vending machine
+    * Purchase product from vending machine
     */
-    #[Route('/{product}', name: 'product', methods: ['GET'])]
-    public function return(Request $request, string $product): JsonResponse
+    #[Route('/purchase', name: 'purchase', methods: ['POST'])]
+    public function purchase(Request $request): JsonResponse
     {
         try {
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['product'])) {
+                return $this->json([
+                    'message' => 'Product field is required'
+                ], 400);
+            }
+            
+            $product = $data['product'];
             $response = $this->getProductUseCase->execute($product);
 
             return $this->json([
