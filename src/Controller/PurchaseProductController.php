@@ -31,6 +31,7 @@ class PurchaseProductController extends AbstractController
             $data = json_decode($request->getContent(), true);
             
             $purchaseRequest = new PurchaseProductRequest($data['product'] ?? null);
+            
             $response = $this->purchaseProductUseCase->execute($purchaseRequest);
 
             return $this->json([
