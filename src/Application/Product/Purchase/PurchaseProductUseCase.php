@@ -2,39 +2,78 @@
 
 namespace App\Application\Product\Purchase;
 
-use App\Domain\Money\MoneyRepositoryInterface;
+use App\Domain\Money\Exception\InsufficientChangeException;
+use App\Domain\Money\MachineMoneyRepositoryInterface;
+use App\Domain\Money\UserMoneyRepositoryInterface;
+use App\Domain\Product\Exception\InsufficientStockException;
 use App\Domain\Product\ProductFactory;
-use App\Domain\Product\ProductName;
-use App\Domain\Product\ProductRepositoryInterface;
+use App\Domain\Product\StockRepositoryInterface;
 
 class PurchaseProductUseCase
 {
     private const AVAILABLE_RETURN_COINS = [0.25, 0.10, 0.05];
 
-    private ProductRepositoryInterface $productRepository;
-    private MoneyRepositoryInterface $moneyRepository;
-    public function __construct(ProductRepositoryInterface $productRepository, MoneyRepositoryInterface $moneyRepository)
-    {
-        $this->productRepository = $productRepository;
-        $this->moneyRepository = $moneyRepository;
+    private StockRepositoryInterface $stockRepository;
+    private UserMoneyRepositoryInterface $userMoneyRepository;
+    private MachineMoneyRepositoryInterface $machineMoneyRepository;
+
+    public function __construct(
+        StockRepositoryInterface $stockRepository,
+        UserMoneyRepositoryInterface $userMoneyRepository,
+        MachineMoneyRepositoryInterface $machineMoneyRepository
+    ) {
+        $this->stockRepository = $stockRepository;
+        $this->userMoneyRepository = $userMoneyRepository;
+        $this->machineMoneyRepository = $machineMoneyRepository;
     }
 
     public function execute(PurchaseProductRequest $request): PurchaseProductResponse
     {
         $product = ProductFactory::create($request->product());
 
-        $moneyInserted = $this->moneyRepository->getCurrentBalance();
+        $this->validateStockAvailability($product->name());
+
+        $moneyInserted = $this->userMoneyRepository->getCurrentBalance();
 
         $product->checkPrice($moneyInserted);
 
         $change = $this->calculateChange($moneyInserted, $product->price());
 
-        $this->moneyRepository->clearCoins();
+        $this->validateChangeAvailability($change, $moneyInserted, $product->price());
+
+        $this->processTransaction($product->name(), $change);
 
         return new PurchaseProductResponse(
             $product->name(),
             $change
         );
+    }
+
+    private function validateStockAvailability(string $productName): void
+    {
+        if (!$this->stockRepository->hasStock($productName)) {
+            throw InsufficientStockException::forProduct($productName);
+        }
+    }
+
+    private function validateChangeAvailability(array $change, float $moneyInserted, float $productPrice): void
+    {
+        if (empty($change)) {
+            return;
+        }
+
+        if (!$this->machineMoneyRepository->hasEnoughChange($change)) {
+            throw InsufficientChangeException::forAmount($moneyInserted - $productPrice);
+        }
+    }
+
+    private function processTransaction(string $productName, array $change): void
+    {
+        $this->stockRepository->decreaseStock($productName);
+
+        $this->userMoneyRepository->clearCoins();
+        
+        $this->machineMoneyRepository->decreaseChangeCoins($change);
     }
 
     private function calculateChange(float $moneyInserted, float $productPrice): array

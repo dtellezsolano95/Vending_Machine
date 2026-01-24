@@ -3,13 +3,13 @@
 namespace App\Application\Money\Return;
 
 use App\Domain\Money\Coin;
-use App\Domain\Money\MoneyRepositoryInterface;
+use App\Domain\Money\UserMoneyRepositoryInterface;
 
 class ReturnMoneyUseCase
 {
-    private MoneyRepositoryInterface $moneyRepository;
+    private UserMoneyRepositoryInterface $moneyRepository;
 
-    public function __construct(MoneyRepositoryInterface $moneyRepository)
+    public function __construct(UserMoneyRepositoryInterface $moneyRepository)
     {
         $this->moneyRepository = $moneyRepository;
     }

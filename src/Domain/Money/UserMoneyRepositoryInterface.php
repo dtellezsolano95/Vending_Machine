@@ -2,7 +2,7 @@
 
 namespace App\Domain\Money;
 
-interface MoneyRepositoryInterface
+interface UserMoneyRepositoryInterface
 {
     public function saveCoin(Coin $coin): void;
 
@@ -11,6 +11,4 @@ interface MoneyRepositoryInterface
     public function getInsertedCoins(): array;
 
     public function clearCoins(): void;
-
-    public function setChangeCoins(float $coinValue, int $count): void;
 }

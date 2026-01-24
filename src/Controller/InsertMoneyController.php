@@ -22,7 +22,7 @@ class InsertMoneyController extends AbstractController
     }
 
     /**
-    * Insert money into the vending machine
+    * Insert money into vending machine
     */
     #[Route('/insert', name: 'insert', methods: ['POST'])]
     public function insert(Request $request): JsonResponse

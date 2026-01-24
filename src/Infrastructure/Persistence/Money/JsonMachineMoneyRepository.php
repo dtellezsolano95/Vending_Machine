@@ -2,58 +2,11 @@
 
 namespace App\Infrastructure\Persistence\Money;
 
-use App\Domain\Money\Coin;
 use App\Domain\Money\MachineMoneyRepositoryInterface;
-use App\Domain\Money\UserMoneyRepositoryInterface;
 
-class FileMoneyRepository implements UserMoneyRepositoryInterface, MachineMoneyRepositoryInterface
+class JsonMachineMoneyRepository implements MachineMoneyRepositoryInterface
 {
-    private const MONEY_FILE = __DIR__ . '/../../../var/money.txt';
-    private const CHANGE_FILE = __DIR__ . '/../../../var/change.json';
-
-    public function saveCoin(Coin $coin): void
-    {
-        $this->ensureDirectoryExists();
-        
-        file_put_contents(self::MONEY_FILE, $coin->value() . "\n", FILE_APPEND);
-    }
-
-    public function getCurrentBalance(): float
-    {
-        if (!file_exists(self::MONEY_FILE)) {
-            return 0.0;
-        }
-
-        $content = file_get_contents(self::MONEY_FILE);
-        if ($content === false || empty(trim($content))) {
-            return 0.0;
-        }
-
-        $coins = array_filter(explode("\n", trim($content)));
-        return array_sum(array_map('floatval', $coins));
-    }
-
-    public function getInsertedCoins(): array
-    {
-        if (!file_exists(self::MONEY_FILE)) {
-            return [];
-        }
-
-        $content = file_get_contents(self::MONEY_FILE);
-        if ($content === false || empty(trim($content))) {
-            return [];
-        }
-
-        $coins = array_filter(explode("\n", trim($content)));
-        return array_map(fn($value) => new Coin(floatval($value)), $coins);
-    }
-
-    public function clearCoins(): void
-    {
-        if (file_exists(self::MONEY_FILE)) {
-            unlink(self::MONEY_FILE);
-        }
-    }
+    private const CHANGE_FILE = __DIR__ . '/../../../var/machine_change.json';
 
     public function setChangeCoins(float $coinValue, int $count): void
     {
@@ -74,14 +27,27 @@ class FileMoneyRepository implements UserMoneyRepositoryInterface, MachineMoneyR
     public function hasEnoughChange(array $requiredChange): bool
     {
         $availableChange = $this->loadChange();
-        $requiredCount = [];
+
+        $requiredCoinsCount = $this->countRequiredCoins($requiredChange);
+
+        return $this->validateAvailableChange($availableChange, $requiredCoinsCount);
+    }
+
+    private function countRequiredCoins(array $requiredChange): array
+    {
+        $requiredCoinsCount = [];
 
         foreach ($requiredChange as $coinValue) {
             $key = (string) $coinValue;
-            $requiredCount[$key] = ($requiredCount[$key] ?? 0) + 1;
+            $requiredCoinsCount[$key] = ($requiredCoinsCount[$key] ?? 0) + 1;
         }
 
-        foreach ($requiredCount as $coinKey => $count) {
+        return $requiredCoinsCount;
+    }
+
+    private function validateAvailableChange(array $availableChange, array $requiredCoinsCount): bool
+    {
+        foreach ($requiredCoinsCount as $coinKey => $count) {
             $available = $availableChange[$coinKey] ?? 0;
             if ($available < $count) {
                 return false;
@@ -93,6 +59,10 @@ class FileMoneyRepository implements UserMoneyRepositoryInterface, MachineMoneyR
 
     public function decreaseChangeCoins(array $change): void
     {
+        if (empty($change)) {
+            return;
+        }
+
         $this->ensureDirectoryExists();
         
         $availableChange = $this->loadChange();
@@ -124,7 +94,7 @@ class FileMoneyRepository implements UserMoneyRepositoryInterface, MachineMoneyR
 
     private function ensureDirectoryExists(): void
     {
-        $dir = dirname(self::MONEY_FILE);
+        $dir = dirname(self::CHANGE_FILE);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }

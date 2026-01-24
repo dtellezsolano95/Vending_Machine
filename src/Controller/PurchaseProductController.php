@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Application\Product\Purchase\PurchaseProductRequest;
 use App\Application\Product\Purchase\PurchaseProductUseCase;
+use App\Domain\Money\Exception\InsufficientChangeException;
 use App\Domain\Money\Exception\InvalidCoinValueException;
+use App\Domain\Product\Exception\InsufficientStockException;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,6 +40,14 @@ class PurchaseProductController extends AbstractController
                 'product_name' => $response->productName(),
                 'change_returned' => $response->changeReturned()
             ]);
+        } catch (InsufficientStockException $e) {
+            return $this->json([
+                'message' => $e->getMessage()
+            ], 400);
+        } catch (InsufficientChangeException $e) {
+            return $this->json([
+                'message' => $e->getMessage()
+            ], 400);
         } catch (InvalidArgumentException $e) {
             return $this->json([
                 'message' => $e->getMessage()
@@ -48,7 +58,8 @@ class PurchaseProductController extends AbstractController
             ], 400);
         } catch (\Exception $e) {
             return $this->json([
-                'message' => 'Failed to return coins'
+                'message' => 'Failed to purchase product',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -23,8 +23,11 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\Domain\Money\MoneyRepositoryInterface:
-        class: App\Infrastructure\Persistence\Money\FileMoneyRepository
+    App\Domain\Money\UserMoneyRepositoryInterface:
+        class: App\Infrastructure\Persistence\Money\JsonUserMoneyRepository
 
-    App\Domain\Product\ProductRepositoryInterface:
-        class: App\Infrastructure\Persistence\Product\FileProductRepository
+    App\Domain\Money\MachineMoneyRepositoryInterface:
+        class: App\Infrastructure\Persistence\Money\JsonMachineMoneyRepository
+
+    App\Domain\Product\StockRepositoryInterface:
+        class: App\Infrastructure\Persistence\Product\JsonStockRepository
