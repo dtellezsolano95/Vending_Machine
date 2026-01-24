@@ -29,6 +29,44 @@ The API will be available at: `http://localhost:8000`
 docker-compose down
 ```
 
+## Testing
+
+The project includes comprehensive test suites to ensure code quality and functionality.
+
+### Unit Tests
+
+Unit tests validate individual components in isolation using mocks and stubs. They are located in the `tests/Unit` directory.
+
+Run all unit tests:
+```bash
+php vendor/bin/phpunit --testsuite Unit
+```
+
+Run a specific unit test:
+```bash
+php vendor/bin/phpunit tests/Unit/Application/Money/Insert/InsertMoneyUseCaseTest.php
+```
+
+### Acceptance Tests (End-to-End)
+
+Acceptance tests validate the complete system behavior by making real HTTP requests to the API endpoints. They are located in the `tests/Integration` directory.
+
+Run all acceptance tests:
+```bash
+php vendor/bin/phpunit --testsuite Integration
+```
+
+Run a specific acceptance test:
+```bash
+php vendor/bin/phpunit tests/Integration/InsertMoneyAcceptanceTest.php
+```
+
+### Run All Tests
+
+Run both unit and acceptance tests:
+```bash
+php vendor/bin/phpunit
+```
 
 ## API Endpoints
 
