@@ -2,14 +2,6 @@
 
 A RESTful API built with Symfony framework for managing a vending machine system. This API provides basic CRUD operations and purchase functionality.
 
-## Features
-
-- ✅ Basic GET and POST operations
-- ✅ RESTful API endpoints
-- ✅ Docker support for easy deployment
-- ✅ JSON responses
-- ✅ Health check endpoint
-
 ## Requirements
 
 - Docker Desktop
