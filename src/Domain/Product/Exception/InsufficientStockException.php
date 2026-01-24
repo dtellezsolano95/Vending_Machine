@@ -6,6 +6,6 @@ class InsufficientStockException extends \Exception
 {
     public static function forProduct(string $productName): self
     {
-        return new self(sprintf('Insufficient stock for product "%s"', $productName));
+        return new self(sprintf('NO stock for product "%s"', $productName));
     }
 }

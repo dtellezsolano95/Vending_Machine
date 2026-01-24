@@ -6,6 +6,6 @@ class InsufficientChangeException extends \Exception
 {
     public static function forAmount(float $amount): self
     {
-        return new self(sprintf('Insufficient change available to return %.2f', $amount));
+        return new self(sprintf('NO change available to return %.2f', $amount));
     }
 }
