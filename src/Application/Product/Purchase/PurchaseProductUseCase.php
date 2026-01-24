@@ -2,6 +2,7 @@
 
 namespace App\Application\Product\Purchase;
 
+use App\Domain\Money\ChangeCalculator;
 use App\Domain\Money\Exception\InsufficientChangeException;
 use App\Domain\Money\MachineMoneyRepositoryInterface;
 use App\Domain\Money\UserMoneyRepositoryInterface;
@@ -11,20 +12,21 @@ use App\Domain\Product\StockRepositoryInterface;
 
 class PurchaseProductUseCase
 {
-    private const AVAILABLE_RETURN_COINS = [0.25, 0.10, 0.05];
-
     private StockRepositoryInterface $stockRepository;
     private UserMoneyRepositoryInterface $userMoneyRepository;
     private MachineMoneyRepositoryInterface $machineMoneyRepository;
+    private ChangeCalculator $changeCalculator;
 
     public function __construct(
         StockRepositoryInterface $stockRepository,
         UserMoneyRepositoryInterface $userMoneyRepository,
-        MachineMoneyRepositoryInterface $machineMoneyRepository
+        MachineMoneyRepositoryInterface $machineMoneyRepository,
+        ChangeCalculator $changeCalculator
     ) {
         $this->stockRepository = $stockRepository;
         $this->userMoneyRepository = $userMoneyRepository;
         $this->machineMoneyRepository = $machineMoneyRepository;
+        $this->changeCalculator = $changeCalculator;
     }
 
     public function execute(PurchaseProductRequest $request): PurchaseProductResponse
@@ -37,7 +39,7 @@ class PurchaseProductUseCase
 
         $product->checkPrice($moneyInserted);
 
-        $change = $this->calculateChange($moneyInserted, $product->price());
+        $change = $this->changeCalculator->calculate($moneyInserted, $product->price());
 
         $this->validateChangeAvailability($change, $moneyInserted, $product->price());
 
@@ -74,23 +76,5 @@ class PurchaseProductUseCase
         $this->userMoneyRepository->clearCoins();
         
         $this->machineMoneyRepository->decreaseChangeCoins($change);
-    }
-
-    private function calculateChange(float $moneyInserted, float $productPrice): array
-    {
-        $change = [];
-
-        $difference = $moneyInserted - $productPrice;
-        
-        $remaining = round($difference, 2);
-        
-        foreach (self::AVAILABLE_RETURN_COINS as $coin) {
-            while ($remaining >= $coin - 0.001) {
-                $change[] = $coin;
-                $remaining = round($remaining - $coin, 2);
-            }
-        }
-        
-        return $change;
     }
 }
