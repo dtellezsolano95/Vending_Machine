@@ -6,19 +6,19 @@ use App\Application\Money\Insert\InsertMoneyRequest;
 use App\Application\Money\Insert\InsertMoneyUseCase;
 use App\Domain\Money\Coin;
 use App\Domain\Money\Exception\InvalidCoinValueException;
-use App\Domain\Money\MoneyRepositoryInterface;
+use App\Domain\Money\UserMoneyRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class InsertMoneyUseCaseTest extends TestCase
 {
-    private MoneyRepositoryInterface&MockObject $moneyRepository;
+    private UserMoneyRepositoryInterface&MockObject $userMoneyRepository;
     private InsertMoneyUseCase $useCase;
 
     protected function setUp(): void
     {
-        $this->moneyRepository = $this->createMock(MoneyRepositoryInterface::class);
-        $this->useCase = new InsertMoneyUseCase($this->moneyRepository);
+        $this->userMoneyRepository = $this->createMock(UserMoneyRepositoryInterface::class);
+        $this->useCase = new InsertMoneyUseCase($this->userMoneyRepository);
     }
 
     public function testShouldInsertValidCoinAndReturnsCorrectResponse(): void
@@ -30,12 +30,12 @@ class InsertMoneyUseCaseTest extends TestCase
         $request = new InsertMoneyRequest(['coin' => $coinValue]);
         $coin = new Coin($coinValue);
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->once())
             ->method('saveCoin')
             ->with($coin);
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->once())
             ->method('getCurrentBalance')
             ->willReturn($expectedBalance);
@@ -59,11 +59,11 @@ class InsertMoneyUseCaseTest extends TestCase
         $firstRequest = new InsertMoneyRequest(['coin' => $firstCoinValue]);
         $secondRequest = new InsertMoneyRequest(['coin' => $secondCoinValue]);
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->exactly(2))
             ->method('saveCoin');
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->exactly(2))
             ->method('getCurrentBalance')
             ->willReturnOnConsecutiveCalls($expectedBalanceAfterFirst, $expectedBalanceAfterSecond);
@@ -98,11 +98,11 @@ class InsertMoneyUseCaseTest extends TestCase
         // Arrange
         $request = new InsertMoneyRequest(['coin' => $coinValue]);
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->once())
             ->method('saveCoin');
         
-        $this->moneyRepository
+        $this->userMoneyRepository
             ->expects($this->once())
             ->method('getCurrentBalance')
             ->willReturn($coinValue);
