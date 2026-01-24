@@ -31,6 +31,12 @@ docker-compose up -d
 
 The API will be available at: `http://localhost:8000`
 
+### 3. Stop Docker containers
+
+```bash
+docker-compose down
+```
+
 
 ## API Endpoints
 
@@ -42,7 +48,6 @@ Returns the API status.
 
 ```json
 {
-  "status": "ok",
   "timestamp": 1234567890,
   "service": "Vending Machine API"
 }
@@ -51,6 +56,8 @@ Returns the API status.
 ### Insert money
 
 **POST** `/api/money/insert`
+
+Inserts a coin into the vending machine. Valid coins are: 0.05, 0.10, 0.25, 1.00.
 
 Request example:
 ```json
@@ -62,7 +69,6 @@ Request example:
 Response example:
 ```json
 {
-  "success": true,
   "coin_inserted": 1,
   "current_balance": 1.25
 }
@@ -72,16 +78,22 @@ Response example:
 
 **POST** `/api/money/return`
 
+Returns all coins inserted by the user without making a purchase.
+
 Response example:
 ```json
 {
-    "coins_returned": []
+    "coins_returned": [
+        1
+    ]
 }
 ```
 
 ### Purchase product
 
-**POST** `/api/product/purchase`
+**POST** `/api/purchase`
+
+Purchases a product from the vending machine. Requires sufficient balance and stock availability. Returns change if applicable.
 
 Request example:
 ```json
@@ -101,9 +113,67 @@ Response example:
 }
 ```
 
+### Service (Technician)
 
-## Stop containers
+**POST** `/api/service`
 
-```bash
-docker-compose down
+Allows technicians to set product stock and replenish change coins.
+
+Request example:
+```json
+{
+  "items": [
+    {
+      "code": "WATER",
+      "count": 10
+    },
+    {
+      "code": "JUICE",
+      "count": 8
+    },
+    {
+      "code": "SODA",
+      "count": 5
+    }
+  ],
+  "change": [
+    { "value": 0.05, "count": 20 },
+    { "value": 0.10, "count": 15 },
+    { "value": 0.25, "count": 10 }
+  ]
+}
+```
+
+Response example:
+```json
+{
+    "items_updated": [
+        {
+            "code": "WATER",
+            "count": 10
+        },
+        {
+            "code": "JUICE",
+            "count": 8
+        },
+        {
+            "code": "SODA",
+            "count": 5
+        }
+    ],
+    "change_updated": [
+        {
+            "value": 0.05,
+            "count": 20
+        },
+        {
+            "value": 0.1,
+            "count": 15
+        },
+        {
+            "value": 0.25,
+            "count": 10
+        }
+    ]
+}
 ```
