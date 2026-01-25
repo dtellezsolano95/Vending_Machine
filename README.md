@@ -83,71 +83,11 @@ Returns the API status.
 }
 ```
 
-### Insert money
-
-**POST** `/api/money/insert`
-
-Inserts a coin into the vending machine. Valid coins are: 0.05, 0.10, 0.25, 1.00.
-
-Request example:
-```json
-{
-  "coin": 1
-}
-```
-
-Response example:
-```json
-{
-  "coin_inserted": 1,
-  "current_balance": 1.25
-}
-```
-
-### Return money
-
-**POST** `/api/money/return`
-
-Returns all coins inserted by the user without making a purchase.
-
-Response example:
-```json
-{
-    "coins_returned": [
-        1
-    ]
-}
-```
-
-### Purchase product
-
-**POST** `/api/purchase`
-
-Purchases a product from the vending machine. Requires sufficient balance and stock availability. Returns change if applicable.
-
-Request example:
-```json
-{
-    "product": "WATER"
-}
-```
-
-Response example:
-```json
-{
-    "product_name": "WATER",
-    "change_returned": [
-        0.25,
-        0.1
-    ]
-}
-```
-
 ### Service (Technician)
 
 **POST** `/api/service`
 
-Allows technicians to set product stock and replenish change coins.
+Allows technicians to set product stock and restock change coins. This endpoint must be called first to set up the vending machine environment before using other endpoints.
 
 Request example:
 ```json
@@ -204,6 +144,66 @@ Response example:
             "value": 0.25,
             "count": 10
         }
+    ]
+}
+```
+
+### Insert money
+
+**POST** `/api/money/insert`
+
+Inserts a coin into the vending machine. Valid coins are: 0.05, 0.10, 0.25, 1.00.
+
+Request example:
+```json
+{
+  "coin": 1
+}
+```
+
+Response example:
+```json
+{
+  "coin_inserted": 1,
+  "current_balance": 1.25
+}
+```
+
+### Return money
+
+**POST** `/api/money/return`
+
+Returns all coins inserted by the user without making a purchase.
+
+Response example:
+```json
+{
+    "coins_returned": [
+        1
+    ]
+}
+```
+
+### Purchase product
+
+**POST** `/api/purchase`
+
+Purchases a product from the vending machine. Requires sufficient balance and stock availability. Returns change if applicable.
+
+Request example:
+```json
+{
+    "product": "WATER"
+}
+```
+
+Response example:
+```json
+{
+    "product_name": "WATER",
+    "change_returned": [
+        0.25,
+        0.1
     ]
 }
 ```
