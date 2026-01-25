@@ -127,7 +127,7 @@ class ReturnMoneyAcceptanceTest extends WebTestCase
     {
         // Arrange
         $client = static::createClient();
-        $coinValue = 0.50;
+        $coinValue = 0.25;
 
         // Insert a coin
         $client->jsonRequest(
