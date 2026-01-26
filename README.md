@@ -4,26 +4,45 @@ A RESTful API built with Symfony framework for managing a vending machine system
 
 ## Requirements
 
-- Docker Desktop
+- Docker Desktop (must be running)
 - Docker Compose
 
 ## Quick Start
 
-### 1. Install dependencies
+### 1. Ensure Docker Desktop is running
 
+Verify Docker is running:
 ```bash
-composer install
+docker --version
 ```
 
-### 2. Start with Docker
+### 2. Start the application
 
 ```bash
 docker-compose up -d
 ```
 
+The first time you run this command, Docker will:
+- Build the container images
+- Start the application
+
+### 3. Install PHP dependencies inside the container
+
+```bash
+docker-compose exec app composer install --no-interaction --prefer-dist --optimize-autoloader
+```
+
+This installs all required PHP dependencies inside the running container.
+
 The API will be available at: `http://localhost:8000`
 
-### 3. Stop Docker containers
+### 4. Verify the application is running
+
+```bash
+curl http://localhost:8000/api/health
+```
+
+### 5. Stop Docker containers
 
 ```bash
 docker-compose down

@@ -22,20 +22,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files first
-COPY composer.json composer.lock* symfony.lock /var/www/
-
-# Install dependencies
-RUN composer install --no-interaction --no-scripts --prefer-dist
-
 # Copy existing application directory contents
 COPY . /var/www
 
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www
 
-# Run composer scripts and optimize autoloader
-RUN composer dump-autoload --optimize
+# Install dependencies and optimize autoloader
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
